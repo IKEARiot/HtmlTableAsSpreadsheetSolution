@@ -63,6 +63,7 @@
     <Content Include="Scripts\HtmlTableToSpreadSheet.js" />
     <Content Include="Scripts\jquery-2.0.3.js" />
     <Content Include="Scripts\jquery-2.0.3.min.js" />
+    <Content Include="StyleSheet1.css" />
     <Content Include="Web.config" />
     <Content Include="Scripts\jquery-2.0.3.min.map" />
   </ItemGroup>

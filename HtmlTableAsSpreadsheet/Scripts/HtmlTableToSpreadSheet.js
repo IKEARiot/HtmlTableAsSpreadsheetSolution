@@ -53,9 +53,9 @@
     function GetValueFromCell(thisCell) {
         var curVal = 0;
         if (thisCell.children.length > 0) {
-            curVal = parseFloat(thisCell.children[0].innerHTML);
+            curVal = parseFloat(thisCell.children[0].value);
             if (isNaN(curVal)) {
-                curVal = parseFloat(thisCell.children[0].value);
+                curVal = parseFloat(thisCell.children[0].innerHTML);
             }
         } else {
             if (thisCell.firstChild != null) {
@@ -83,6 +83,7 @@
             
             var cell = row.cells[realIndexAtCell3.x];
             if (cell.children.length > 0) {
+                cell.children[0].value = thisTable[realIndexAtCell3.x][realIndexAtCell3.y];
                 cell.children[0].innerHTML = thisTable[realIndexAtCell3.x][realIndexAtCell3.y];
             }
             else {
@@ -91,27 +92,50 @@
         }
     }
 
-    function ProcessInstruction(instruction, thisTable) {
+    function ProcessInstruction(instruction, thisTable, mappings) {
         var result =  0;        
         var i = 0;
         for (var i = 0; i < instruction.inputCells.length; i++) {
 
+            var valueToUse = 0;
             var cell1 = instruction.inputCells[i];
-            var realIndexAtCell1 = GetRealIndexFromCell(cell1);
-            var valueAtCell1 = parseFloat(thisTable[realIndexAtCell1.x][realIndexAtCell1.y]);
-
-            if (i == 0) {
-                result = valueAtCell1;
+            if (isCellReal(cell1) == true) {
+                var realIndexAtCell1 = GetRealIndexFromCell(cell1);
+                var valueAtCell1 = parseFloat(thisTable[realIndexAtCell1.x][realIndexAtCell1.y]);
+                valueToUse= valueAtCell1;
             }
             else {
-                result = instruction.operator(result, valueAtCell1);
+                valueToUse = mappings[cell1];
+            }
+
+            if (i == 0) {
+                result = valueToUse;
+            }
+            else {
+                result = instruction.operator(result, valueToUse);
             }
         }
        
         var cell3 = instruction.outputCell;
-        var realIndexAtCell3 = GetRealIndexFromCell(cell3);
 
-        thisTable[realIndexAtCell3.x][realIndexAtCell3.y] = result;
+        if (isCellReal(cell3) == true) {
+            var realIndexAtCell3 = GetRealIndexFromCell(cell3);
+            thisTable[realIndexAtCell3.x][realIndexAtCell3.y] = result;
+        }
+        else {            
+            mappings[cell3] = result;
+
+        }
+                
+    }  
+
+    function isCellReal(outputCell) {
+        if (outputCell.indexOf("!") == 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
     function GetRealIndexFromCell(cell) {
@@ -195,6 +219,7 @@
         this.settings = settings;
         this.$elem = $elem;
         this.internalTable = null;
+        this.mappings = null;
         return this;
     }
 
@@ -204,7 +229,7 @@
 	        var $this = this;
 	        if ($this.myhtmlTableToSpreadSheet) return $this.myhtmlTableToSpreadSheet;
 	        $this.myhtmlTableToSpreadSheet = $('<div class="_HtmlTableToSpreadSheet_holder"></div>');
-	        $this.reset();
+	        $this.reset();	       
 	        return $this.myhtmlTableToSpreadSheet;
 	    },
 	    reset: function () {
@@ -215,9 +240,9 @@
 	        var mytable = this.$elem[0];
 	        this.internalTable = CreateInternalRepresentation(mytable);
 	        var instructions = this.settings.instructions;
-
+	        this.mappings = new Array();
 	        for (var i = 0; i < instructions.length; i++) {
-	            ProcessInstruction(instructions[i], this.internalTable);
+	            ProcessInstruction(instructions[i], this.internalTable, this.mappings);
 	        }
 	     
 	        PaintTable(instructions, this.internalTable, mytable);

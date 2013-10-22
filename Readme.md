@@ -72,6 +72,38 @@ function refreshTable() {
 }
 ```
 
+or
+```js
+ $("#Mine3").htmlTableToSpreadSheet({
+		instructions: [{ inputCells: ["B2", "C2"], operator: function (x, y) { return x * y; }, outputCell: "!C2" },
+					{ inputCells: ["!C2", "D2"], operator: function (x, y) { return x - y; }, outputCell: "!D2" },
+					{ inputCells: ["!D2", "E2"], operator: function (x, y) { return x + y; }, outputCell: "!E2" },
+					{ inputCells: ["!E2", "F2"], operator: function (x, y) { return x - y; }, outputCell: "!F2" },
+					{ inputCells: ["!F2", "G2"], operator: function (x, y) { return x - y; }, outputCell: "H2" },
+					{ inputCells: ["B3", "C3"], operator: function (x, y) { return x * y; }, outputCell: "!C3" },
+					{ inputCells: ["!C3", "D3"], operator: function (x, y) { return x - y; }, outputCell: "!D3" },
+					{ inputCells: ["!D3", "E3"], operator: function (x, y) { return x + y; }, outputCell: "!E3" },
+					{ inputCells: ["!E3", "F3"], operator: function (x, y) { return x - y; }, outputCell: "!F3" },
+					{ inputCells: ["!F3", "G3"], operator: function (x, y) { return x - y; }, outputCell: "H3" }
+				   ]
+	});}
+```
+
+Usage
+-----
+Instructions can be passed into the plug-in using JSON. Gerneally this involves specifying two source cells and an output cell e.g.
+```js
+{ inputCells: ["C2", "D2"], operator: function (x, y) { return x * y; }, outputCell: "E2" }
+```
+More complicated instructions can be chained together through the use of temporary stores prefixed by '!' e.g.
+```js
+{ inputCells: ["B2", "C2"], operator: function (x, y) { return x * y; }, outputCell: "!C2" }
+```
+The above example takes two real cells and places the result in a variable '!C2'. This variable can then be used as part of an instruction e.g.
+```js
+{ inputCells: ["!C2", "D2"], operator: function (x, y) { return x - y; }, outputCell: "D2" }
+```
+
 Method
 ------
 The jQuery plugin was built using "websanova/boilerplate" template available on Git.
@@ -79,7 +111,7 @@ The jQuery plugin was built using "websanova/boilerplate" template available on 
 
 Limitations and caveats
 -----------------------
-First attempt at jQuery plug-in with some not-very-strong Javascript. HTML tables should be flat with consistent number of columns per row. Error-handling is a dream yet to be realised. Solution is in VS2012 but does not depend on it.
+First attempt at jQuery plug-in with some not-very-strong Javascript. HTML tables should be flat with consistent number of columns per row. Currently there is no way to specify generic formulae for all columns or rows, for example ["C","D"]. Error-handling is a dream yet to be realised. Solution is in VS2012 but does not depend on it.
 
 Author
 ------
