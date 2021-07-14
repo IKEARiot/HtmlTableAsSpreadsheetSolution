@@ -115,4 +115,4 @@ First attempt at jQuery plug-in with some not-very-strong Javascript. HTML table
 
 Author
 ------
-GC
+Gareth
